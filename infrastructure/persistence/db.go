@@ -13,6 +13,7 @@ import (
 
 type Repository struct {
 	ProductRepository interfaces.ProductRepository
+	UserRepository    interfaces.UserRepository
 	db                *sql.DB
 }
 
@@ -33,6 +34,7 @@ func NewRepository(config *models.Config) (*Repository, error) {
 	// defer db.Close()
 	return &Repository{
 		ProductRepository: repository.NewProductRepository(db),
+		UserRepository:    repository.NewUserRepository(db),
 		db:                db,
 	}, nil
 }

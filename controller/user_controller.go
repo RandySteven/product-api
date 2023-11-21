@@ -7,6 +7,7 @@ import (
 
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/request"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/utils"
 	"github.com/gorilla/mux"
 )
@@ -67,7 +68,42 @@ func (controller *UserController) GetUserById(res http.ResponseWriter, req *http
 
 // LoginUser implements interfaces.UserController.
 func (controller *UserController) LoginUser(res http.ResponseWriter, req *http.Request) {
-	panic("unimplemented")
+	res.Header().Set("Content-Type", "application/json")
+	var request request.UserLoginRequest
+	err := json.NewDecoder(req.Body).Decode(&request)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		resp := models.Response{
+			Errors: []string{err.Error()},
+		}
+		json.NewEncoder(res).Encode(resp)
+		return
+	}
+	pass, err := utils.HashPassword(request.Password)
+	request.Password = pass
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		resp := models.Response{
+			Errors: []string{err.Error()},
+		}
+		json.NewEncoder(res).Encode(resp)
+		return
+	}
+	user, err := controller.service.GetUserByEmailAndPassword(request.Email, request.Password)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		resp := models.Response{
+			Errors: []string{err.Error()},
+		}
+		json.NewEncoder(res).Encode(resp)
+		return
+	}
+	resp := models.Response{
+		Message: "Success created user",
+		Data:    user,
+	}
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(resp)
 }
 
 // RegisterUser implements interfaces.UserController.
@@ -103,7 +139,12 @@ func (controller *UserController) RegisterUser(res http.ResponseWriter, req *htt
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	json.NewEncoder(res).Encode(userStore)
+	resp := models.Response{
+		Message: "Success created user",
+		Data:    userStore,
+	}
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(resp)
 }
 
 func NewUserController(service interfaces.UserService) *UserController {

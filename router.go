@@ -15,4 +15,9 @@ func (h *Handlers) InitRouter(r *mux.Router) {
 	productRouter.HandleFunc("/{id}", h.ProductController.GetProductById).Methods(http.MethodGet)
 	productRouter.HandleFunc("/{id}", h.ProductController.UpdateProductById).Methods(http.MethodPut)
 
+	userRouter := r.PathPrefix("/users").Subrouter()
+	userRouter.HandleFunc("", h.UserController.GetAllUsers).Methods(http.MethodGet)
+	userRouter.HandleFunc("/register", h.UserController.RegisterUser).Methods(http.MethodPost)
+	userRouter.HandleFunc("/{id}", h.UserController.GetUserById).Methods(http.MethodGet)
+	userRouter.HandleFunc("/login", h.UserController.LoginUser).Methods(http.MethodGet)
 }

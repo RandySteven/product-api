@@ -10,13 +10,16 @@ import (
 type (
 	Handlers struct {
 		ProductController interfaces.ProductController
+		UserController    interfaces.UserController
 	}
 )
 
 func NewHandlers(repo persistence.Repository) (*Handlers, error) {
 	productService := services.NewProductService(repo.ProductRepository)
+	userService := services.NewUserService(repo.UserRepository)
 
 	return &Handlers{
 		ProductController: controller.NewProductController(productService),
+		UserController:    controller.NewUserController(userService),
 	}, nil
 }
