@@ -13,6 +13,7 @@ type (
 		GetProductById(id uint) (*models.Product, error)
 		UpdateProductById(id uint, product *models.Product) (*models.Product, error)
 		DeleteProductById(id uint) error
+		DeleteAllProducts()
 	}
 
 	ProductService interface {

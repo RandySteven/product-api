@@ -12,6 +12,12 @@ type ProductRepository struct {
 	db *sql.DB
 }
 
+// DeleteAllProducts implements interfaces.ProductRepository.
+func (repo *ProductRepository) DeleteAllProducts() {
+	query := "DELETE FROM products"
+	repo.db.Exec(query)
+}
+
 // DeleteProductById implements repositories.ProductRepository.
 func (repo *ProductRepository) DeleteProductById(id uint) error {
 	query := "UPDATE products SET deleted_at = NOW() WHERE id = $1"
