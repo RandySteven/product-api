@@ -22,9 +22,7 @@ type (
 	}
 
 	UserController interface {
-		RegisterUser(res http.ResponseWriter, req *http.Request)
 		GetAllUsers(res http.ResponseWriter, req *http.Request)
 		GetUserById(res http.ResponseWriter, req *http.Request)
-		LoginUser(res http.ResponseWriter, req *http.Request)
 	}
 )

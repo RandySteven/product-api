@@ -37,6 +37,9 @@ func main() {
 	}
 
 	v1 := r.PathPrefix("/v1").Subrouter()
+	v1.HandleFunc("/login", handlers.AuthController.LoginUser)
+	v1.HandleFunc("/register", handlers.AuthController.RegisterUser)
+	v1.HandleFunc("/logout", handlers.AuthController.LogoutUser)
 	handlers.InitRouter(v1)
 
 	srv := http.Server{

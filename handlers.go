@@ -16,16 +16,19 @@ type (
 	Handlers struct {
 		ProductController interfaces.ProductController
 		UserController    interfaces.UserController
+		AuthController    interfaces.AuthController
 	}
 )
 
 func NewHandlers(repo persistence.Repository) (*Handlers, error) {
 	productService := services.NewProductService(repo.ProductRepository)
 	userService := services.NewUserService(repo.UserRepository)
+	authService := services.NewAuthService(repo.AuthRepository)
 
 	return &Handlers{
 		ProductController: controller.NewProductController(productService),
 		UserController:    controller.NewUserController(userService),
+		AuthController:    controller.NewAuthController(authService),
 	}, nil
 }
 
@@ -54,6 +57,7 @@ func (h Handlers) AuthMiddleware(next http.Handler) http.Handler {
 				Errors: []string{"Unauthorized"},
 			}
 			json.NewEncoder(res).Encode(resp)
+			return
 		}
 
 		if !token.Valid {
@@ -61,6 +65,7 @@ func (h Handlers) AuthMiddleware(next http.Handler) http.Handler {
 				Errors: []string{"Unauthorized"},
 			}
 			json.NewEncoder(res).Encode(resp)
+			return
 		}
 
 		next.ServeHTTP(res, req)

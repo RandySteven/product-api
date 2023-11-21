@@ -14,6 +14,7 @@ import (
 type Repository struct {
 	ProductRepository interfaces.ProductRepository
 	UserRepository    interfaces.UserRepository
+	AuthRepository    interfaces.AuthRepository
 	db                *sql.DB
 }
 
@@ -35,6 +36,7 @@ func NewRepository(config *models.Config) (*Repository, error) {
 	return &Repository{
 		ProductRepository: repository.NewProductRepository(db),
 		UserRepository:    repository.NewUserRepository(db),
+		AuthRepository:    repository.NewAuthRepository(db),
 		db:                db,
 	}, nil
 }
