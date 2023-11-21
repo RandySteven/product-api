@@ -55,6 +55,7 @@ func (repo *ProductRepository) Find() ([]models.Product, error) {
 func (repo *ProductRepository) GetProductById(id uint) (*models.Product, error) {
 	query := "SELECT p.id, p.name, p.price, p.stock, c.id, c.name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.id = $1"
 	var product models.Product
+	product.Category = &models.Category{}
 	err := repo.db.QueryRow(query, id).
 		Scan(&product.ID,
 			&product.Name,
