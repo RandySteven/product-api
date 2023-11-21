@@ -7,6 +7,7 @@ import (
 
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/repository"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
@@ -31,7 +32,7 @@ func NewRepository(config *models.Config) (*Repository, error) {
 	}
 	// defer db.Close()
 	return &Repository{
-		ProductRepository: NewProductRepository(db),
+		ProductRepository: repository.NewProductRepository(db),
 		db:                db,
 	}, nil
 }
