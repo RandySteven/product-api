@@ -123,6 +123,7 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 	if err != nil {
 		resp := models.Response{
 			Message: "Bad request",
+			Errors:  []string{err.Error()},
 		}
 		res.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(res).Encode(resp)
