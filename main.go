@@ -5,9 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/controller"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/infrastructure/persistence"
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/services"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -30,14 +28,12 @@ func main() {
 	}
 	defer service.Close()
 
-	productController := controller.NewProductController(services.NewProductService(service.ProductRepository))
+	handlers, err := NewHandlers(*service)
+	if err != nil {
+		return
+	}
 
-	productRouter := r.PathPrefix("/products").Subrouter()
-	productRouter.HandleFunc("", productController.CreateProduct).Methods(http.MethodPost)
-	productRouter.HandleFunc("", productController.GetAllProducts).Methods(http.MethodGet)
-	productRouter.HandleFunc("/{id}", productController.DeleteProductById).Methods(http.MethodDelete)
-	productRouter.HandleFunc("/{id}", productController.GetProductById).Methods(http.MethodGet)
-	productRouter.HandleFunc("/{id}", productController.UpdateProductById).Methods(http.MethodPut)
+	handlers.InitRouter(r)
 
 	srv := http.Server{
 		Addr:    ":8080",
