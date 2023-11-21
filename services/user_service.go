@@ -20,8 +20,8 @@ func (service *UserService) GetAllUsers() ([]models.User, error) {
 }
 
 // GetUserByEmailAndPassword implements interfaces.UserService.
-func (service *UserService) GetUserByEmailAndPassword(email string, password string) (*models.User, error) {
-	return service.repo.GetUserByEmailAndPassword(email, password)
+func (service *UserService) GetUserByEmail(email string) (*models.User, error) {
+	return service.repo.GetUserByEmail(email)
 }
 
 // GetUserById implements interfaces.UserService.

@@ -33,8 +33,8 @@ func (repo *UserRepository) Find() ([]models.User, error) {
 }
 
 // GetUserByEmailAndPassword implements interfaces.UserRepository.
-func (repo *UserRepository) GetUserByEmailAndPassword(email string, password string) (*models.User, error) {
-	query := "SELECT id, name, email, password, role_id FROM users WHERE email = $1 AND password = $2"
+func (repo *UserRepository) GetUserByEmail(email string) (*models.User, error) {
+	query := "SELECT id, name, email, password, role_id FROM users WHERE email = $1"
 	stmt, err := repo.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (repo *UserRepository) GetUserByEmailAndPassword(email string, password str
 	defer stmt.Close()
 
 	var user models.User
-	err = stmt.QueryRow(query, email, password).
+	err = stmt.QueryRow(email).
 		Scan(
 			&user.ID,
 			&user.Name,

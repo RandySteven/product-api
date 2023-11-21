@@ -2,11 +2,18 @@ package middleware
 
 import "net/http"
 
-// func MiddlewareHandler(h http.Handler) http.Handler {
-// 	// return http.HandlerFunc()
-// }
-
-func MiddlewareAuth(res http.ResponseWriter, req *http.Request) bool {
+func MiddlewareAuth(next http.Handler) http.Handler {
 	// username, password, ok := req.BasicAuth()
-	return false
+	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		if Authenticated(req) {
+			http.Redirect(res, req, "/users/login", http.StatusSeeOther)
+			return
+		}
+
+		next.ServeHTTP(res, req)
+	})
+}
+
+func Authenticated(req *http.Request) bool {
+	return true
 }

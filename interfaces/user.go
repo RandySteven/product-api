@@ -11,14 +11,14 @@ type (
 		Save(user *models.User) (*models.User, error)
 		Find() ([]models.User, error)
 		GetUserById(id uint) (*models.User, error)
-		GetUserByEmailAndPassword(email, password string) (*models.User, error)
+		GetUserByEmail(email string) (*models.User, error)
 	}
 
 	UserService interface {
 		CreateUser(user *models.User) (*models.User, error)
 		GetAllUsers() ([]models.User, error)
 		GetUserById(id uint) (*models.User, error)
-		GetUserByEmailAndPassword(email, password string) (*models.User, error)
+		GetUserByEmail(email string) (*models.User, error)
 	}
 
 	UserController interface {

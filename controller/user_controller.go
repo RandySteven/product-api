@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/infrastructure/persistence"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/request"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/utils"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 )
 
@@ -89,7 +92,7 @@ func (controller *UserController) LoginUser(res http.ResponseWriter, req *http.R
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	user, err := controller.service.GetUserByEmailAndPassword(request.Email, request.Password)
+	user, err := controller.service.GetUserByEmail(request.Email)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		resp := models.Response{
@@ -98,8 +101,40 @@ func (controller *UserController) LoginUser(res http.ResponseWriter, req *http.R
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
+
+	// err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
+	// if err != nil {
+	// 	res.WriteHeader(http.StatusUnauthorized)
+	// 	return
+	// }
+
+	expTime := time.Now().Add(time.Minute * 1)
+	claims := &persistence.JWTClaim{
+		Email: user.Email,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "go-jwt-mux",
+			ExpiresAt: jwt.NewNumericDate(expTime),
+		},
+	}
+	tokenAlgo := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token, err := tokenAlgo.SignedString(persistence.JWT_KEY)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		resp := models.Response{
+			Errors: []string{err.Error()},
+		}
+		json.NewEncoder(res).Encode(resp)
+		return
+	}
+	http.SetCookie(res, &http.Cookie{
+		Name:     "token",
+		Path:     "/",
+		Value:    token,
+		HttpOnly: true,
+	})
+
 	resp := models.Response{
-		Message: "Success created user",
+		Message: "Success login user",
 		Data:    user,
 	}
 	res.WriteHeader(http.StatusOK)
