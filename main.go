@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/infrastructure/persistence"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -21,7 +22,9 @@ func main() {
 	dbPass := os.Getenv("DB_PASS")
 	dbHost := os.Getenv("DB_HOST")
 	dbUser := os.Getenv("DB_USER")
-	service, err := persistence.NewRepository(dbHost, dbPort, dbUser, dbPass, dbName)
+	config := models.NewConfig(dbHost, dbPort, dbUser, dbPass, dbName)
+
+	service, err := persistence.NewRepository(config)
 	if err != nil {
 		log.Println(err)
 		return
@@ -33,7 +36,8 @@ func main() {
 		return
 	}
 
-	handlers.InitRouter(r)
+	v1 := r.PathPrefix("/v1").Subrouter()
+	handlers.InitRouter(v1)
 
 	srv := http.Server{
 		Addr:    ":8080",

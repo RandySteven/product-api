@@ -153,7 +153,7 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	res.WriteHeader(http.StatusOK)
+	res.WriteHeader(http.StatusCreated)
 	resp := models.Response{
 		Message: "Success add product",
 		Data:    storeProduct,

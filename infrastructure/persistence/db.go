@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
@@ -14,13 +15,13 @@ type Repository struct {
 	db                *sql.DB
 }
 
-func NewRepository(dbHost, dbPort, dbUser, dbPass, dbName string) (*Repository, error) {
+func NewRepository(config *models.Config) (*Repository, error) {
 	conn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		dbHost,
-		dbPort,
-		dbUser,
-		dbPass,
-		dbName,
+		config.DbHost,
+		config.DbPort,
+		config.DbUser,
+		config.DbPass,
+		config.DbName,
 	)
 	log.Println(conn)
 	db, err := sql.Open("pgx", conn)
