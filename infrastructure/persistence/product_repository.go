@@ -14,7 +14,7 @@ type ProductRepository struct {
 
 // DeleteProductById implements repositories.ProductRepository.
 func (repo *ProductRepository) DeleteProductById(id uint) error {
-	query := "DELETE FROM products WHERE id = $1"
+	query := "UPDATE products SET deleted_at = NOW() WHERE id = $1"
 	stmt, err := repo.db.Prepare(query)
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func (repo *ProductRepository) DeleteProductById(id uint) error {
 
 // Find implements repositories.ProductRepository.
 func (repo *ProductRepository) Find() ([]models.Product, error) {
-	query := "SELECT id, name, price, stock FROM products"
+	query := "SELECT id, name, price, stock FROM products WHERE deleted_at IS NULL"
 	rows, err := repo.db.Query(query)
 	if err != nil {
 		log.Println("QUERY ERROR : ", err)
@@ -92,9 +92,10 @@ func (repo *ProductRepository) Save(product *models.Product) (*models.Product, e
 
 // UpdateProductById implements repositories.ProductRepository.
 func (repo *ProductRepository) UpdateProductById(id uint, product *models.Product) (*models.Product, error) {
-	query := "UPDATE products SET name = $1, price = $2, stock = $3, category_id = $4 WHERE id = $5"
+	query := "UPDATE products SET name = $1, price = $2, stock = $3, category_id = $4, updated_at=NOW() WHERE id = $5"
 	stmt, err := repo.db.Prepare(query)
 	if err != nil {
+		log.Println("QUERY ERR : ", err)
 		return nil, err
 	}
 	defer stmt.Close()

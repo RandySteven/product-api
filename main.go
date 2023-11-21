@@ -37,6 +37,8 @@ func main() {
 	productRouter.HandleFunc("", productController.GetAllProducts).Methods(http.MethodGet)
 	productRouter.HandleFunc("/{id}", productController.DeleteProductById).Methods(http.MethodDelete)
 	productRouter.HandleFunc("/{id}", productController.GetProductById).Methods(http.MethodGet)
+	productRouter.HandleFunc("/{id}", productController.UpdateProductById).Methods(http.MethodPut)
+
 	srv := http.Server{
 		Addr:    ":8080",
 		Handler: r,

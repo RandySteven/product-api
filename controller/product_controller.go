@@ -62,7 +62,7 @@ func (controller *ProductController) UpdateProductById(res http.ResponseWriter, 
 	err = json.NewDecoder(req.Body).Decode(&productRequest)
 	if err != nil {
 		resp := models.Response{
-			Message: "Internal server error",
+			Message: "Bad Request",
 		}
 		res.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(res).Encode(resp)
@@ -127,6 +127,21 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
+	// validationErr := product.Validate()
+	// if validationErr != nil {
+	// 	var errors []string
+	// 	for _, currErr := range validationErr {
+	// 		errMsg := fmt.Sprintf("%s field is %s", currErr.Field(), currErr.ActualTag())
+	// 		errors = append(errors, errMsg)
+	// 	}
+	// 	resp := models.Response{
+	// 		Message: "Bad request",
+	// 		Errors:  errors,
+	// 	}
+	// 	res.WriteHeader(http.StatusBadRequest)
+	// 	json.NewEncoder(res).Encode(resp)
+	// 	return
+	// }
 	storeProduct, err := controller.services.CreateProduct(&product)
 	if err != nil {
 		resp := models.Response{
