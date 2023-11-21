@@ -9,6 +9,7 @@ import (
 
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/request"
 	"github.com/gorilla/mux"
 )
 
@@ -117,8 +118,8 @@ func (controller *ProductController) DeleteProductById(res http.ResponseWriter, 
 // CreateProduct implements interfaces.ProductController.
 func (controller *ProductController) CreateProduct(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
-	var product models.Product
-	err := json.NewDecoder(req.Body).Decode(&product)
+	var request request.ProductRequest
+	err := json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
 		resp := models.Response{
 			Message: "Bad request",
@@ -127,21 +128,22 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	// validationErr := product.Validate()
-	// if validationErr != nil {
-	// 	var errors []string
-	// 	for _, currErr := range validationErr {
-	// 		errMsg := fmt.Sprintf("%s field is %s", currErr.Field(), currErr.ActualTag())
-	// 		errors = append(errors, errMsg)
-	// 	}
-	// 	resp := models.Response{
-	// 		Message: "Bad request",
-	// 		Errors:  errors,
-	// 	}
-	// 	res.WriteHeader(http.StatusBadRequest)
-	// 	json.NewEncoder(res).Encode(resp)
-	// 	return
-	// }
+	validationErr := request.Validate()
+	if validationErr != nil {
+		resp := models.Response{
+			Message: "Bad request",
+			Errors:  validationErr,
+		}
+		res.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(res).Encode(resp)
+		return
+	}
+	product := models.Product{
+		Name:       request.Name,
+		Price:      request.Price,
+		Stock:      request.Stock,
+		CategoryID: request.CategoryID,
+	}
 	storeProduct, err := controller.services.CreateProduct(&product)
 	if err != nil {
 		resp := models.Response{
