@@ -11,6 +11,7 @@ import (
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/request"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/response"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -130,7 +131,7 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	validationErr := request.Validate()
+	validationErr := utils.Validate(request)
 	if validationErr != nil {
 		resp := response.Response{
 			Message: "Bad request",

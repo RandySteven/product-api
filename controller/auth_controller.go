@@ -114,15 +114,32 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 // RegisterUser implements interfaces.AuthController.
 func (controller *AuthController) RegisterUser(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
-	var user models.User
-	err := json.NewDecoder(req.Body).Decode(&user)
+	var register request.UserRegisterRequest
+	err := json.NewDecoder(req.Body).Decode(&register)
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
 		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
+		res.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(res).Encode(resp)
 		return
+	}
+
+	validationErr := utils.Validate(register)
+	if validationErr != nil {
+		resp := response.Response{
+			Errors: validationErr,
+		}
+		res.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(res).Encode(resp)
+		return
+	}
+
+	user := &models.User{
+		Name:     register.Name,
+		Email:    register.Email,
+		Password: register.Password,
+		RoleID:   register.RoleID,
 	}
 
 	pass, err := utils.HashPassword(user.Password)
@@ -135,7 +152,7 @@ func (controller *AuthController) RegisterUser(res http.ResponseWriter, req *htt
 		return
 	}
 	user.Password = pass
-	userStore, err := controller.service.RegisterUser(&user)
+	userStore, err := controller.service.RegisterUser(user)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		resp := response.Response{
