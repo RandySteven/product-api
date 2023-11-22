@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/infrastructure/persistence"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/configs"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -24,7 +24,7 @@ func main() {
 	dbUser := os.Getenv("DB_USER")
 	config := models.NewConfig(dbHost, dbPort, dbUser, dbPass, dbName)
 
-	service, err := persistence.NewRepository(config)
+	service, err := configs.NewRepository(config)
 	if err != nil {
 		log.Println(err)
 		return

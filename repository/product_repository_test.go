@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/infrastructure/persistence"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/configs"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/repository"
 	"github.com/DATA-DOG/go-sqlmock"
@@ -25,7 +25,7 @@ func TestProductRepositoryByTestDB(t *testing.T) {
 			DbUser: os.Getenv("TEST_DB_USER"),
 			DbPass: os.Getenv("TEST_DB_PASS"),
 		}
-		service, _ := persistence.NewRepository(&testConfig)
+		service, _ := configs.NewRepository(&testConfig)
 		product := &models.Product{
 			Name:       "TestProduct1",
 			Price:      10000,
@@ -62,7 +62,7 @@ func TestProductRepositoryByTestDB(t *testing.T) {
 			Stock:      100,
 			CategoryID: 2,
 		}
-		service, _ := persistence.NewRepository(&testConfig)
+		service, _ := configs.NewRepository(&testConfig)
 		service.ProductRepository.Save(product1)
 		service.ProductRepository.Save(product2)
 		products, err := service.ProductRepository.Find()
@@ -89,7 +89,7 @@ func TestProductRepositoryByTestDB(t *testing.T) {
 			CategoryID: 1,
 		}
 
-		service, _ := persistence.NewRepository(&testConfig)
+		service, _ := configs.NewRepository(&testConfig)
 		savedProduct, _ := service.ProductRepository.Save(product)
 
 		assert.Equal(t, product.Name, savedProduct.Name)
@@ -122,7 +122,7 @@ func TestProductRepositoryByTestDB(t *testing.T) {
 			Stock:      200,
 			CategoryID: 1,
 		}
-		service, _ := persistence.NewRepository(&testConfig)
+		service, _ := configs.NewRepository(&testConfig)
 		savedProduct, _ := service.ProductRepository.Save(product)
 
 		product, _ = service.ProductRepository.UpdateProductById(savedProduct.ID, updatedProduct)
@@ -158,7 +158,7 @@ func TestProductRepositoryByTestDB(t *testing.T) {
 				Name: "Sembako",
 			},
 		}
-		service, _ := persistence.NewRepository(&testConfig)
+		service, _ := configs.NewRepository(&testConfig)
 		savedProduct, _ := service.ProductRepository.Save(product)
 
 		detailProduct, _ := service.ProductRepository.GetProductById(savedProduct.ID)

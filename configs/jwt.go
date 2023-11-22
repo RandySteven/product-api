@@ -1,4 +1,4 @@
-package persistence
+package configs
 
 import "github.com/golang-jwt/jwt/v5"
 

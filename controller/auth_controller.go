@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/infrastructure/persistence"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/configs"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/request"
@@ -79,7 +79,7 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 	// }
 
 	expTime := time.Now().Add(time.Minute * 1)
-	claims := &persistence.JWTClaim{
+	claims := &configs.JWTClaim{
 		Email: user.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "go-jwt-mux",
@@ -87,7 +87,7 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 		},
 	}
 	tokenAlgo := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenAlgo.SignedString(persistence.JWT_KEY)
+	token, err := tokenAlgo.SignedString(configs.JWT_KEY)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		resp := response.Response{

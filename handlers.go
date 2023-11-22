@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/configs"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/controller"
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/infrastructure/persistence"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/response"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/services"
@@ -20,7 +20,7 @@ type (
 	}
 )
 
-func NewHandlers(repo persistence.Repository) (*Handlers, error) {
+func NewHandlers(repo configs.Repository) (*Handlers, error) {
 	productService := services.NewProductService(repo.ProductRepository)
 	userService := services.NewUserService(repo.UserRepository)
 	authService := services.NewAuthService(repo.AuthRepository)
@@ -47,9 +47,9 @@ func (h Handlers) AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		tokenString := cookie.Value
-		claims := &persistence.JWTClaim{}
+		claims := &configs.JWTClaim{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
-			return persistence.JWT_KEY, nil
+			return configs.JWT_KEY, nil
 		})
 
 		if err != nil {
