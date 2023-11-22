@@ -7,7 +7,7 @@ import (
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/controller"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/infrastructure/persistence"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/response"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/services"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -38,7 +38,7 @@ func (h Handlers) AuthMiddleware(next http.Handler) http.Handler {
 		cookie, err := req.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				resp := models.Response{
+				resp := response.Response{
 					Errors: []string{"Unauthorized"},
 				}
 				res.WriteHeader(http.StatusUnauthorized)
@@ -53,7 +53,7 @@ func (h Handlers) AuthMiddleware(next http.Handler) http.Handler {
 		})
 
 		if err != nil {
-			resp := models.Response{
+			resp := response.Response{
 				Errors: []string{"Unauthorized"},
 			}
 			json.NewEncoder(res).Encode(resp)
@@ -61,7 +61,7 @@ func (h Handlers) AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		if !token.Valid {
-			resp := models.Response{
+			resp := response.Response{
 				Errors: []string{"Unauthorized"},
 			}
 			json.NewEncoder(res).Encode(resp)

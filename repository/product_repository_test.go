@@ -98,6 +98,72 @@ func TestProductRepositoryByTestDB(t *testing.T) {
 		assert.Equal(t, product.CategoryID, savedProduct.CategoryID)
 		service.ProductRepository.DeleteAllProducts()
 	})
+
+	t.Run("should return product after update product", func(t *testing.T) {
+		if err := godotenv.Load(); err != nil {
+			log.Println("no env got")
+		}
+		testConfig := models.Config{
+			DbHost: os.Getenv("TEST_DB_HOST"),
+			DbName: os.Getenv("TEST_DB_NAME"),
+			DbPort: os.Getenv("TEST_DB_PORT"),
+			DbUser: os.Getenv("TEST_DB_USER"),
+			DbPass: os.Getenv("TEST_DB_PASS"),
+		}
+		product := &models.Product{
+			Name:       "TestProduct1",
+			Price:      10000,
+			Stock:      100,
+			CategoryID: 1,
+		}
+		updatedProduct := &models.Product{
+			Name:       "TestProduct1",
+			Price:      15000,
+			Stock:      200,
+			CategoryID: 1,
+		}
+		service, _ := persistence.NewRepository(&testConfig)
+		savedProduct, _ := service.ProductRepository.Save(product)
+
+		product, _ = service.ProductRepository.UpdateProductById(savedProduct.ID, updatedProduct)
+		assert.Equal(t, product.Price, updatedProduct.Price)
+		assert.Equal(t, product.Name, updatedProduct.Name)
+		service.ProductRepository.DeleteAllProducts()
+	})
+
+	t.Run("should return product detail after get detail product by id", func(t *testing.T) {
+		if err := godotenv.Load(); err != nil {
+			log.Println("no env got")
+		}
+		testConfig := models.Config{
+			DbHost: os.Getenv("TEST_DB_HOST"),
+			DbName: os.Getenv("TEST_DB_NAME"),
+			DbPort: os.Getenv("TEST_DB_PORT"),
+			DbUser: os.Getenv("TEST_DB_USER"),
+			DbPass: os.Getenv("TEST_DB_PASS"),
+		}
+		product := &models.Product{
+			Name:       "TestProduct1",
+			Price:      10000,
+			Stock:      100,
+			CategoryID: 1,
+		}
+		expectedProduct := &models.Product{
+			Name:       "TestProduct1",
+			Price:      10000,
+			Stock:      100,
+			CategoryID: 0,
+			Category: &models.Category{
+				ID:   1,
+				Name: "Sembako",
+			},
+		}
+		service, _ := persistence.NewRepository(&testConfig)
+		savedProduct, _ := service.ProductRepository.Save(product)
+
+		detailProduct, _ := service.ProductRepository.GetProductById(savedProduct.ID)
+		assert.Equal(t, expectedProduct.Category, detailProduct.Category)
+	})
 }
 
 func TestProductRepositoryByMock(t *testing.T) {
@@ -151,6 +217,31 @@ func TestProductRepositoryByMock(t *testing.T) {
 		assert.NotNil(t, savedProduct, "expected a product to be returned")
 		assert.Equal(t, uint(1), savedProduct.ID, "expected the ID to be set")
 		assert.NoError(t, mock.ExpectationsWereMet(), "expected all SQL expectations to be met")
+	})
+
+	t.Run("should called update method", func(t *testing.T) {
+		// db, mock, err := sqlmock.New()
+		// query := "UPDATE products SET name = $1, price = $2, stock = $3, category_id = $4, updated_at=NOW() WHERE id = $5"
+		// updatedProduct := &models.Product{
+		// 	Name:  "UpdatedProduct",
+		// 	Price: 10000,
+		// 	Stock: 10,
+		// }
+		// if err != nil {
+		// 	t.Fatalf("error creating sqlmock : %v", err)
+		// }
+		// defer db.Close()
+
+		// repo := repository.NewProductRepository(db)
+
+		// mock.ExpectPrepare(query).
+		// 	ExpectExec().
+		// 	WithArgs("UpdatedProduct", 1000, 10, 1, 1)
+
+		// product, err := repo.UpdateProductById(1, updatedProduct)
+
+		// assert.NoError(t, err, "expected no error")
+		// assert.NotNil(t, product)
 	})
 
 	t.Run("should called find method", func(t *testing.T) {
