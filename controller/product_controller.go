@@ -10,6 +10,7 @@ import (
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/request"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/response"
 	"github.com/gorilla/mux"
 )
 
@@ -23,7 +24,7 @@ func (controller *ProductController) GetProductById(res http.ResponseWriter, req
 	params := mux.Vars(req)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Bad request, invalid id",
 		}
 		res.WriteHeader(http.StatusBadRequest)
@@ -32,14 +33,14 @@ func (controller *ProductController) GetProductById(res http.ResponseWriter, req
 	}
 	product, err := controller.services.GetProductById(uint(id))
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Product not found",
 		}
 		res.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success deleted",
 		Data:    product,
 	}
@@ -52,7 +53,7 @@ func (controller *ProductController) UpdateProductById(res http.ResponseWriter, 
 	params := mux.Vars(req)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Bad request, invalid id",
 		}
 		res.WriteHeader(http.StatusBadRequest)
@@ -62,7 +63,7 @@ func (controller *ProductController) UpdateProductById(res http.ResponseWriter, 
 	var productRequest models.Product
 	err = json.NewDecoder(req.Body).Decode(&productRequest)
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Bad Request",
 		}
 		res.WriteHeader(http.StatusInternalServerError)
@@ -71,14 +72,14 @@ func (controller *ProductController) UpdateProductById(res http.ResponseWriter, 
 	}
 	productResp, err := controller.services.UpdateProductById(uint(id), &productRequest)
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Internal server error",
 		}
 		res.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success updated product",
 		Data:    productResp,
 	}
@@ -93,7 +94,7 @@ func (controller *ProductController) DeleteProductById(res http.ResponseWriter, 
 	params := mux.Vars(req)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Bad request, invalid id",
 		}
 		res.WriteHeader(http.StatusBadRequest)
@@ -102,14 +103,14 @@ func (controller *ProductController) DeleteProductById(res http.ResponseWriter, 
 	}
 	err = controller.services.DeleteProductById(uint(id))
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: fmt.Sprintf("product id for %d not found", id),
 		}
 		res.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success deleted",
 	}
 	json.NewEncoder(res).Encode(resp)
@@ -121,7 +122,7 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 	var request request.ProductRequest
 	err := json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Bad request",
 			Errors:  []string{err.Error()},
 		}
@@ -131,7 +132,7 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 	}
 	validationErr := request.Validate()
 	if validationErr != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Bad request",
 			Errors:  validationErr,
 		}
@@ -147,7 +148,7 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 	}
 	storeProduct, err := controller.services.CreateProduct(&product)
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Internal server error",
 		}
 		res.WriteHeader(http.StatusInternalServerError)
@@ -155,7 +156,7 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 		return
 	}
 	res.WriteHeader(http.StatusCreated)
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success add product",
 		Data:    storeProduct,
 	}

@@ -9,6 +9,7 @@ import (
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/request"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/response"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -27,7 +28,7 @@ func (*AuthController) LogoutUser(res http.ResponseWriter, req *http.Request) {
 		HttpOnly: true,
 		MaxAge:   -1,
 	})
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success to logout",
 	}
 	res.WriteHeader(http.StatusOK)
@@ -45,7 +46,7 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 	err := json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
 		json.NewEncoder(res).Encode(resp)
@@ -55,7 +56,7 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 	request.Password = pass
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
 		json.NewEncoder(res).Encode(resp)
@@ -64,7 +65,7 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 	user, err := controller.service.LoginUserByEmail(request.Email)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
 		json.NewEncoder(res).Encode(resp)
@@ -89,7 +90,7 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 	token, err := tokenAlgo.SignedString(persistence.JWT_KEY)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
 		json.NewEncoder(res).Encode(resp)
@@ -102,7 +103,7 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 		HttpOnly: true,
 	})
 
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success login user",
 		Data:    user,
 	}
@@ -117,7 +118,7 @@ func (controller *AuthController) RegisterUser(res http.ResponseWriter, req *htt
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
 		json.NewEncoder(res).Encode(resp)
@@ -127,7 +128,7 @@ func (controller *AuthController) RegisterUser(res http.ResponseWriter, req *htt
 	pass, err := utils.HashPassword(user.Password)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
 		json.NewEncoder(res).Encode(resp)
@@ -137,13 +138,13 @@ func (controller *AuthController) RegisterUser(res http.ResponseWriter, req *htt
 	userStore, err := controller.service.RegisterUser(&user)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success created user",
 		Data:    userStore,
 	}

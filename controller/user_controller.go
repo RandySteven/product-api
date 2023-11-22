@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/models"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/response"
 	"github.com/gorilla/mux"
 )
 
@@ -20,13 +20,13 @@ func (controller *UserController) GetAllUsers(res http.ResponseWriter, req *http
 	users, err := controller.service.GetAllUsers()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{err.Error()},
 		}
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success get all users",
 		Data:    users,
 	}
@@ -40,7 +40,7 @@ func (controller *UserController) GetUserById(res http.ResponseWriter, req *http
 	params := mux.Vars(req)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Message: "Bad request, invalid id",
 		}
 		res.WriteHeader(http.StatusBadRequest)
@@ -49,14 +49,14 @@ func (controller *UserController) GetUserById(res http.ResponseWriter, req *http
 	}
 	user, err := controller.service.GetUserById(uint(id))
 	if err != nil {
-		resp := models.Response{
+		resp := response.Response{
 			Errors: []string{"User not found"},
 		}
 		res.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	resp := models.Response{
+	resp := response.Response{
 		Message: "Success get user",
 		Data:    user,
 	}
