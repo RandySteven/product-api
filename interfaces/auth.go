@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	AuthController interface {
+	AuthHandler interface {
 		RegisterUser(res http.ResponseWriter, req *http.Request)
 		LoginUser(res http.ResponseWriter, req *http.Request)
 		LogoutUser(res http.ResponseWriter, req *http.Request)
@@ -18,7 +18,7 @@ type (
 		RegisterUser(user *models.User) (*models.User, error)
 	}
 
-	AuthService interface {
+	AuthUseCase interface {
 		LoginUserByEmail(email string) (*models.User, error)
 		RegisterUser(user *models.User) (*models.User, error)
 	}

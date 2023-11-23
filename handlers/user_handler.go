@@ -1,4 +1,4 @@
-package controller
+package handlers
 
 import (
 	"encoding/json"
@@ -11,13 +11,13 @@ import (
 )
 
 type UserController struct {
-	service interfaces.UserService
+	usecase interfaces.UserUseCase
 }
 
 // GetAllUsers implements interfaces.UserController.
 func (controller *UserController) GetAllUsers(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
-	users, err := controller.service.GetAllUsers()
+	users, err := controller.usecase.GetAllUsers()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		resp := response.Response{
@@ -47,7 +47,7 @@ func (controller *UserController) GetUserById(res http.ResponseWriter, req *http
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	user, err := controller.service.GetUserById(uint(id))
+	user, err := controller.usecase.GetUserById(uint(id))
 	if err != nil {
 		resp := response.Response{
 			Errors: []string{"User not found"},
@@ -64,8 +64,8 @@ func (controller *UserController) GetUserById(res http.ResponseWriter, req *http
 	json.NewEncoder(res).Encode(resp)
 }
 
-func NewUserController(service interfaces.UserService) *UserController {
-	return &UserController{service: service}
+func NewUserHandler(usecase interfaces.UserUseCase) *UserController {
+	return &UserController{usecase: usecase}
 }
 
-var _ interfaces.UserController = &UserController{}
+var _ interfaces.UserHandler = &UserController{}

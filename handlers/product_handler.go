@@ -1,4 +1,4 @@
-package controller
+package handlers
 
 import (
 	"encoding/json"
@@ -15,12 +15,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type ProductController struct {
-	services interfaces.ProductService
+type ProductHandler struct {
+	usecase interfaces.ProductUseCase
 }
 
-// GetProductById implements interfaces.ProductController.
-func (controller *ProductController) GetProductById(res http.ResponseWriter, req *http.Request) {
+// GetProductById implements interfaces.ProductHandler.
+func (controller *ProductHandler) GetProductById(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(req)
 	id, err := strconv.Atoi(params["id"])
@@ -32,7 +32,7 @@ func (controller *ProductController) GetProductById(res http.ResponseWriter, req
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	product, err := controller.services.GetProductById(uint(id))
+	product, err := controller.usecase.GetProductById(uint(id))
 	if err != nil {
 		resp := response.Response{
 			Message: "Product not found",
@@ -48,8 +48,8 @@ func (controller *ProductController) GetProductById(res http.ResponseWriter, req
 	json.NewEncoder(res).Encode(resp)
 }
 
-// UpdateProductById implements interfaces.ProductController.
-func (controller *ProductController) UpdateProductById(res http.ResponseWriter, req *http.Request) {
+// UpdateProductById implements interfaces.ProductHandler.
+func (controller *ProductHandler) UpdateProductById(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(req)
 	id, err := strconv.Atoi(params["id"])
@@ -71,7 +71,7 @@ func (controller *ProductController) UpdateProductById(res http.ResponseWriter, 
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	productResp, err := controller.services.UpdateProductById(uint(id), &productRequest)
+	productResp, err := controller.usecase.UpdateProductById(uint(id), &productRequest)
 	if err != nil {
 		resp := response.Response{
 			Message: "Internal server error",
@@ -89,8 +89,8 @@ func (controller *ProductController) UpdateProductById(res http.ResponseWriter, 
 
 }
 
-// DeleteProductById implements interfaces.ProductController.
-func (controller *ProductController) DeleteProductById(res http.ResponseWriter, req *http.Request) {
+// DeleteProductById implements interfaces.ProductHandler.
+func (controller *ProductHandler) DeleteProductById(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(req)
 	id, err := strconv.Atoi(params["id"])
@@ -102,7 +102,7 @@ func (controller *ProductController) DeleteProductById(res http.ResponseWriter, 
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	err = controller.services.DeleteProductById(uint(id))
+	err = controller.usecase.DeleteProductById(uint(id))
 	if err != nil {
 		resp := response.Response{
 			Message: fmt.Sprintf("product id for %d not found", id),
@@ -117,8 +117,8 @@ func (controller *ProductController) DeleteProductById(res http.ResponseWriter, 
 	json.NewEncoder(res).Encode(resp)
 }
 
-// CreateProduct implements interfaces.ProductController.
-func (controller *ProductController) CreateProduct(res http.ResponseWriter, req *http.Request) {
+// CreateProduct implements interfaces.ProductHandler.
+func (controller *ProductHandler) CreateProduct(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	var request request.ProductRequest
 	err := json.NewDecoder(req.Body).Decode(&request)
@@ -147,7 +147,7 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 		Stock:      request.Stock,
 		CategoryID: request.CategoryID,
 	}
-	storeProduct, err := controller.services.CreateProduct(&product)
+	storeProduct, err := controller.usecase.CreateProduct(&product)
 	if err != nil {
 		resp := response.Response{
 			Message: "Internal server error",
@@ -164,9 +164,9 @@ func (controller *ProductController) CreateProduct(res http.ResponseWriter, req 
 	json.NewEncoder(res).Encode(resp)
 }
 
-// GetAllProducts implements interfaces.ProductController.
-func (controller *ProductController) GetAllProducts(res http.ResponseWriter, req *http.Request) {
-	products, err := controller.services.GetAllProducts()
+// GetAllProducts implements interfaces.ProductHandler.
+func (controller *ProductHandler) GetAllProducts(res http.ResponseWriter, req *http.Request) {
+	products, err := controller.usecase.GetAllProducts()
 	res.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		log.Println(err)
@@ -177,8 +177,8 @@ func (controller *ProductController) GetAllProducts(res http.ResponseWriter, req
 	json.NewEncoder(res).Encode(products)
 }
 
-func NewProductController(services interfaces.ProductService) *ProductController {
-	return &ProductController{services: services}
+func NewProductHandler(usecase interfaces.ProductUseCase) *ProductHandler {
+	return &ProductHandler{usecase: usecase}
 }
 
-var _ interfaces.ProductController = &ProductController{}
+var _ interfaces.ProductHandler = &ProductHandler{}

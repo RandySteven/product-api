@@ -5,30 +5,30 @@ import (
 	"net/http"
 
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/configs"
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/controller"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/handlers"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/interfaces"
 	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/payload/response"
-	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/services"
+	"git.garena.com/bootcamp/batch-02/shared-projects/product-api.git/usecase"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type (
 	Handlers struct {
-		ProductController interfaces.ProductController
-		UserController    interfaces.UserController
-		AuthController    interfaces.AuthController
+		ProductHandler interfaces.ProductHandler
+		UserHandler    interfaces.UserHandler
+		AuthHandler    interfaces.AuthHandler
 	}
 )
 
 func NewHandlers(repo configs.Repository) (*Handlers, error) {
-	productService := services.NewProductService(repo.ProductRepository)
-	userService := services.NewUserService(repo.UserRepository)
-	authService := services.NewAuthService(repo.AuthRepository)
+	productUseCase := usecase.NewProductUseCase(repo.ProductRepository)
+	userUseCase := usecase.NewUserUseCase(repo.UserRepository)
+	authUseCase := usecase.NewAuthUseCase(repo.AuthRepository)
 
 	return &Handlers{
-		ProductController: controller.NewProductController(productService),
-		UserController:    controller.NewUserController(userService),
-		AuthController:    controller.NewAuthController(authService),
+		ProductHandler: handlers.NewProductHandler(productUseCase),
+		UserHandler:    handlers.NewUserHandler(userUseCase),
+		AuthHandler:    handlers.NewAuthHandler(authUseCase),
 	}, nil
 }
 

@@ -1,4 +1,4 @@
-package controller
+package handlers
 
 import (
 	"encoding/json"
@@ -14,12 +14,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type AuthController struct {
-	service interfaces.AuthService
+type AuthHandler struct {
+	usecase interfaces.AuthUseCase
 }
 
-// LogoutUser implements interfaces.AuthController.
-func (*AuthController) LogoutUser(res http.ResponseWriter, req *http.Request) {
+// LogoutUser implements interfaces.AuthHandler.
+func (*AuthHandler) LogoutUser(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	http.SetCookie(res, &http.Cookie{
 		Name:     "token",
@@ -35,12 +35,12 @@ func (*AuthController) LogoutUser(res http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(res).Encode(resp)
 }
 
-func NewAuthController(service interfaces.AuthService) *AuthController {
-	return &AuthController{service: service}
+func NewAuthHandler(usecase interfaces.AuthUseCase) *AuthHandler {
+	return &AuthHandler{usecase: usecase}
 }
 
-// LoginUser implements interfaces.AuthController.
-func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.Request) {
+// LoginUser implements interfaces.AuthHandler.
+func (controller *AuthHandler) LoginUser(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	var request request.UserLoginRequest
 	err := json.NewDecoder(req.Body).Decode(&request)
@@ -62,7 +62,7 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 		json.NewEncoder(res).Encode(resp)
 		return
 	}
-	user, err := controller.service.LoginUserByEmail(request.Email)
+	user, err := controller.usecase.LoginUserByEmail(request.Email)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		resp := response.Response{
@@ -111,8 +111,8 @@ func (controller *AuthController) LoginUser(res http.ResponseWriter, req *http.R
 	json.NewEncoder(res).Encode(resp)
 }
 
-// RegisterUser implements interfaces.AuthController.
-func (controller *AuthController) RegisterUser(res http.ResponseWriter, req *http.Request) {
+// RegisterUser implements interfaces.AuthHandler.
+func (controller *AuthHandler) RegisterUser(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	var register request.UserRegisterRequest
 	err := json.NewDecoder(req.Body).Decode(&register)
@@ -152,7 +152,7 @@ func (controller *AuthController) RegisterUser(res http.ResponseWriter, req *htt
 		return
 	}
 	user.Password = pass
-	userStore, err := controller.service.RegisterUser(user)
+	userStore, err := controller.usecase.RegisterUser(user)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		resp := response.Response{
@@ -169,4 +169,4 @@ func (controller *AuthController) RegisterUser(res http.ResponseWriter, req *htt
 	json.NewEncoder(res).Encode(resp)
 }
 
-var _ interfaces.AuthController = &AuthController{}
+var _ interfaces.AuthHandler = &AuthHandler{}

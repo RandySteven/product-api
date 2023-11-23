@@ -16,7 +16,7 @@ type (
 		DeleteAllProducts()
 	}
 
-	ProductService interface {
+	ProductUseCase interface {
 		CreateProduct(product *models.Product) (*models.Product, error)
 		GetAllProducts() ([]models.Product, error)
 		GetProductById(id uint) (*models.Product, error)
@@ -24,7 +24,7 @@ type (
 		UpdateProductById(id uint, product *models.Product) (*models.Product, error)
 	}
 
-	ProductController interface {
+	ProductHandler interface {
 		CreateProduct(res http.ResponseWriter, req *http.Request)
 		GetAllProducts(res http.ResponseWriter, req *http.Request)
 		GetProductById(res http.ResponseWriter, req *http.Request)

@@ -14,14 +14,14 @@ type (
 		GetUserByEmail(email string) (*models.User, error)
 	}
 
-	UserService interface {
+	UserUseCase interface {
 		CreateUser(user *models.User) (*models.User, error)
 		GetAllUsers() ([]models.User, error)
 		GetUserById(id uint) (*models.User, error)
 		GetUserByEmail(email string) (*models.User, error)
 	}
 
-	UserController interface {
+	UserHandler interface {
 		GetAllUsers(res http.ResponseWriter, req *http.Request)
 		GetUserById(res http.ResponseWriter, req *http.Request)
 	}
